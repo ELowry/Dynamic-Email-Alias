@@ -25,10 +25,15 @@ function updateContextMenus(domains) {
         }
 
         if (domains.length === 1) {
+            const d = domains[0];
+            const dName = d.domain || d;
+            const pName = d.prefix || "";
             browser.contextMenus.create(
                 {
-                    id: `fill-${domains[0]}`,
-                    title: "Generate Email Alias",
+                    id: `fill-${dName}`,
+                    title: pName
+                        ? `Generate Alias (${pName}[site]@${dName})`
+                        : "Generate Email Alias",
                     contexts: ["editable"]
                 },
                 onCreated
@@ -36,20 +41,18 @@ function updateContextMenus(domains) {
         } else {
             const parentId = "fill-parent";
             browser.contextMenus.create(
-                {
-                    id: parentId,
-                    title: "Generate Email Alias",
-                    contexts: ["editable"]
-                },
+                { id: parentId, title: "Generate Email Alias", contexts: ["editable"] },
                 onCreated
             );
 
-            domains.forEach((domain) => {
+            domains.forEach((d) => {
+                const dName = d.domain || d;
+                const pName = d.prefix || "";
                 browser.contextMenus.create(
                     {
-                        id: `fill-${domain}`,
+                        id: `fill-${dName}`,
                         parentId: parentId,
-                        title: `@${domain}`,
+                        title: pName ? `${pName}[site]@${dName}` : `@${dName}`,
                         contexts: ["editable"]
                     },
                     onCreated
@@ -66,8 +69,8 @@ function loadAndCreateMenus() {
         if (domains.length === 0) {
             browser.storage.sync.get("customDomain").then((legacyResult) => {
                 if (legacyResult.customDomain) {
-                    const newDomains = [legacyResult.customDomain];
-                    browser.storage.sync.set({ customDomains: newDomains }); // Save migrated
+                    const newDomains = [{ domain: legacyResult.customDomain, prefix: "" }];
+                    browser.storage.sync.set({ customDomains: newDomains });
                     updateContextMenus(newDomains);
                 } else {
                     updateContextMenus([]);
@@ -101,21 +104,26 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     }
 
     if (info.menuItemId.startsWith("fill-")) {
-        const domain = info.menuItemId.replace("fill-", "");
+        const clickedDomain = info.menuItemId.replace("fill-", "");
 
-        browser.storage.sync.get(["aliasPrefix", "includeTld"]).then((result) => {
-            // Dynamically inject the content script into the active tab
+        browser.storage.sync.get(["customDomains", "includeTld"]).then((result) => {
+            const domains = result.customDomains || [];
+
+            // Identify the specific config object that corresponds to the clicked domain
+            const matchedDomainObj = domains.find((d) => (d.domain || d) === clickedDomain);
+            const prefix =
+                matchedDomainObj && matchedDomainObj.prefix ? matchedDomainObj.prefix : "";
+
             browser.scripting
                 .executeScript({
                     target: { tabId: tab.id },
                     files: ["content/content.js"]
                 })
                 .then(() => {
-                    // Once injected, send the message with the domain AND the settings
                     browser.tabs.sendMessage(tab.id, {
                         command: "fillEmail",
-                        domain: domain,
-                        prefix: result.aliasPrefix || "",
+                        domain: clickedDomain,
+                        prefix: prefix,
                         includeTld: result.includeTld !== false
                     });
                 })

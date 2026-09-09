@@ -168,7 +168,7 @@ label {
 
 input[type="text"] {
   width: 100%;
-  padding: 10px 12px 10px 38px;
+  padding: 10px 12px;
   font-size: 14px;
   background-color: var(--input-bg);
   border: 1px solid var(--input-border);
@@ -177,6 +177,10 @@ input[type="text"] {
   outline: none;
   transition: all 0.2s;
   color: var(--input-text);
+}
+
+input[type="text"]#newDomainInput {
+  padding-left: 38px;
 }
 
 .test-input {
@@ -250,4 +254,19 @@ input[type="text"]:focus {
   margin-top: 12px;
   text-align: center;
   font-size: 13px;
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.btn-icon {
+  margin-right: 8px;
 }

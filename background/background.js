@@ -2,8 +2,8 @@
 
 function onCreated() {
     if (browser.runtime.lastError) {
-        // Keep internal runtime errors visible for development if needed, 
-        // or remove if strict "no logs" is desired. 
+        // Keep internal runtime errors visible for development if needed,
+        // or remove if strict "no logs" is desired.
         // Usually harmless to keep runtime.lastError check.
         console.error(`Error: ${browser.runtime.lastError}`);
     }
@@ -13,35 +13,47 @@ function updateContextMenus(domains) {
     browser.contextMenus.removeAll().then(() => {
         if (!domains || domains.length === 0) {
             // Show "Configure" everywhere if no domains are set
-            browser.contextMenus.create({
-                id: "configure-extension",
-                title: "Configure SmartEmail...",
-                contexts: ["all"]
-            }, onCreated);
+            browser.contextMenus.create(
+                {
+                    id: "configure-extension",
+                    title: "Configure SmartEmail...",
+                    contexts: ["all"]
+                },
+                onCreated
+            );
             return;
         }
 
         if (domains.length === 1) {
-            browser.contextMenus.create({
-                id: `fill-${domains[0]}`,
-                title: "Generate Email Alias",
-                contexts: ["editable"]
-            }, onCreated);
+            browser.contextMenus.create(
+                {
+                    id: `fill-${domains[0]}`,
+                    title: "Generate Email Alias",
+                    contexts: ["editable"]
+                },
+                onCreated
+            );
         } else {
             const parentId = "fill-parent";
-            browser.contextMenus.create({
-                id: parentId,
-                title: "Generate Email Alias",
-                contexts: ["editable"]
-            }, onCreated);
-
-            domains.forEach(domain => {
-                browser.contextMenus.create({
-                    id: `fill-${domain}`,
-                    parentId: parentId,
-                    title: `@${domain}`,
+            browser.contextMenus.create(
+                {
+                    id: parentId,
+                    title: "Generate Email Alias",
                     contexts: ["editable"]
-                }, onCreated);
+                },
+                onCreated
+            );
+
+            domains.forEach((domain) => {
+                browser.contextMenus.create(
+                    {
+                        id: `fill-${domain}`,
+                        parentId: parentId,
+                        title: `@${domain}`,
+                        contexts: ["editable"]
+                    },
+                    onCreated
+                );
             });
         }
     }); // Errors caught silently or actionable errors only

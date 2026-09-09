@@ -1,4 +1,3 @@
-
 const newDomainInput = document.querySelector("#newDomainInput");
 const statusDiv = document.querySelector("#status");
 const domainListContainer = document.querySelector("#domainList");
@@ -41,11 +40,13 @@ function showStatus(msg, type = "success") {
 }
 
 function saveDomains() {
-    browser.storage.sync.set({
-        customDomains: domains
-    }).then(() => {
-        showStatus("Domains updated");
-    });
+    browser.storage.sync
+        .set({
+            customDomains: domains
+        })
+        .then(() => {
+            showStatus("Domains updated");
+        });
 }
 
 function addDomain() {
@@ -73,12 +74,15 @@ function deleteDomain(index) {
 }
 
 function restoreOptions() {
-    browser.storage.sync.get("customDomains").then((result) => {
-        domains = result.customDomains || [];
-        renderDomains();
-    }, (error) => {
-        console.log(`Error: ${error}`);
-    });
+    browser.storage.sync.get("customDomains").then(
+        (result) => {
+            domains = result.customDomains || [];
+            renderDomains();
+        },
+        (error) => {
+            console.log(`Error: ${error}`);
+        }
+    );
 }
 
 document.addEventListener("DOMContentLoaded", restoreOptions);

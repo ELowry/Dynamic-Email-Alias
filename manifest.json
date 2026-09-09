@@ -8,34 +8,19 @@
             "id": "smartemail@vibecoded.com",
             "strict_min_version": "142.0",
             "data_collection_permissions": {
-                "required": [
-                    "none"
-                ]
+                "required": ["none"]
             }
         }
     },
-    "permissions": [
-        "storage",
-        "contextMenus",
-        "activeTab",
-        "scripting"
-    ],
+    "permissions": ["storage", "contextMenus", "activeTab", "scripting"],
     "background": {
-        "scripts": [
-            "background/background.js"
-        ]
+        "scripts": ["background/background.js"]
     },
     "content_scripts": [
         {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content/content.js"
-            ],
-            "css": [
-                "content/styles.css"
-            ],
+            "matches": ["<all_urls>"],
+            "js": ["content/content.js"],
+            "css": ["content/styles.css"],
             "run_at": "document_end"
         }
     ],

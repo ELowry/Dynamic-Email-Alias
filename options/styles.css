@@ -103,7 +103,7 @@ label {
 
 input[type="text"] {
   width: 100%;
-  padding: 10px 12px 10px 38px;
+  padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -111,6 +111,10 @@ input[type="text"] {
   outline: none;
   transition: all 0.2s;
   color: #374151;
+}
+
+input[type="text"]#newDomainInput {
+  padding-left: 38px;
 }
 
 .test-input {
@@ -142,7 +146,6 @@ input[type="text"]:focus {
   background-color: #6d28d9;
 }
 
-/* Domain List Styles */
 .domain-list {
   margin-bottom: 20px;
 }
@@ -185,4 +188,19 @@ input[type="text"]:focus {
   margin-top: 12px;
   text-align: center;
   font-size: 13px;
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.btn-icon {
+  margin-right: 8px;
 }

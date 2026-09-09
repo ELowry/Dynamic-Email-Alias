@@ -1,21 +1,25 @@
 const newDomainInput = document.querySelector("#newDomainInput");
+const newPrefixInput = document.querySelector("#newPrefixInput");
 const statusDiv = document.querySelector("#status");
 const domainListContainer = document.querySelector("#domainList");
 const addDomainBtn = document.querySelector("#addDomainBtn");
-const prefixInput = document.querySelector("#prefixInput");
 const includeTldToggle = document.querySelector("#includeTldToggle");
 
 let domains = [];
 
 function renderDomains() {
     domainListContainer.innerHTML = "";
-    domains.forEach((domain, index) => {
-        const item = document.createElement("div");
-        item.className = "domain-item";
+    domains.forEach((item, index) => {
+        // Fallback for legacy string data
+        const domainName = item.domain || item;
+        const prefixStr = item.prefix || "";
+
+        const div = document.createElement("div");
+        div.className = "domain-item";
 
         const text = document.createElement("span");
         text.className = "domain-text";
-        text.textContent = domain;
+        text.textContent = prefixStr ? `${prefixStr}[site]@${domainName}` : `[site]@${domainName}`;
 
         const delBtn = document.createElement("button");
         delBtn.className = "delete-btn";
@@ -27,9 +31,9 @@ function renderDomains() {
     `;
         delBtn.addEventListener("click", () => deleteDomain(index));
 
-        item.appendChild(text);
-        item.appendChild(delBtn);
-        domainListContainer.appendChild(item);
+        div.appendChild(text);
+        div.appendChild(delBtn);
+        domainListContainer.appendChild(div);
     });
 }
 
@@ -42,34 +46,39 @@ function showStatus(msg, type = "success") {
 }
 
 function saveDomains() {
-    browser.storage.sync
-        .set({
-            customDomains: domains
-        })
-        .then(() => {
-            showStatus("Domains updated");
-        });
+    browser.storage.sync.set({ customDomains: domains }).then(() => {
+        showStatus("Domains updated");
+    });
 }
 
 function addDomain() {
+    if (!newPrefixInput.checkValidity()) {
+        newPrefixInput.reportValidity();
+        return;
+    }
     if (!newDomainInput.checkValidity()) {
         newDomainInput.reportValidity();
         return;
     }
 
-    const domain = newDomainInput.value.trim();
-    if (!domain) {
+    const domainVal = newDomainInput.value.trim();
+    const prefixVal = newPrefixInput.value.trim();
+
+    if (!domainVal) {
         showStatus("Please enter a domain", "error");
         return;
     }
 
-    if (domains.includes(domain)) {
+    // Check for duplicates
+    const exists = domains.some((d) => (d.domain || d) === domainVal);
+    if (exists) {
         showStatus("Domain already exists", "error");
         return;
     }
 
-    domains.push(domain);
+    domains.push({ domain: domainVal, prefix: prefixVal });
     newDomainInput.value = "";
+    newPrefixInput.value = "";
     renderDomains();
     saveDomains();
 }
@@ -81,10 +90,14 @@ function deleteDomain(index) {
 }
 
 function restoreOptions() {
-    browser.storage.sync.get(["customDomains", "aliasPrefix", "includeTld"]).then(
+    browser.storage.sync.get(["customDomains", "includeTld"]).then(
         (result) => {
-            domains = result.customDomains || [];
-            prefixInput.value = result.aliasPrefix || "";
+            // Map legacy string arrays to the new object format automatically
+            const rawDomains = result.customDomains || [];
+            domains = rawDomains.map((d) =>
+                typeof d === "string" ? { domain: d, prefix: "" } : d
+            );
+
             includeTldToggle.checked = result.includeTld !== false;
             renderDomains();
         },
@@ -95,19 +108,9 @@ function restoreOptions() {
 }
 
 function saveSettings() {
-    if (!prefixInput.checkValidity()) {
-        prefixInput.reportValidity();
-        return;
-    }
-
-    browser.storage.sync
-        .set({
-            aliasPrefix: prefixInput.value.trim(),
-            includeTld: includeTldToggle.checked
-        })
-        .then(() => {
-            showStatus("Settings saved");
-        });
+    browser.storage.sync.set({ includeTld: includeTldToggle.checked }).then(() => {
+        showStatus("Settings saved");
+    });
 }
 
 document.addEventListener("DOMContentLoaded", restoreOptions);
@@ -115,5 +118,4 @@ addDomainBtn.addEventListener("click", addDomain);
 newDomainInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") addDomain();
 });
-prefixInput.addEventListener("change", saveSettings);
 includeTldToggle.addEventListener("change", saveSettings);

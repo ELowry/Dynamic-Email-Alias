@@ -103,9 +103,21 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId.startsWith("fill-")) {
         const domain = info.menuItemId.replace("fill-", "");
 
-        browser.tabs.sendMessage(tab.id, {
-            command: "fillEmail",
-            domain: domain
-        });
+        // Dynamically inject the content script into the active tab
+        browser.scripting
+            .executeScript({
+                target: { tabId: tab.id },
+                files: ["content/content.js"]
+            })
+            .then(() => {
+                // Once injected, send the message with ONLY the domain
+                browser.tabs.sendMessage(tab.id, {
+                    command: "fillEmail",
+                    domain: domain
+                });
+            })
+            .catch((error) => {
+                console.error("Failed to inject script: ", error);
+            });
     }
 });

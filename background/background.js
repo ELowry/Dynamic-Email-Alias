@@ -103,9 +103,13 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId.startsWith("fill-")) {
         const domain = info.menuItemId.replace("fill-", "");
 
-        browser.tabs.sendMessage(tab.id, {
-            command: "fillEmail",
-            domain: domain
+        browser.storage.sync.get(["aliasPrefix", "includeTld"]).then((result) => {
+            browser.tabs.sendMessage(tab.id, {
+                command: "fillEmail",
+                domain: domain,
+                prefix: result.aliasPrefix || "",
+                includeTld: result.includeTld !== false
+            });
         });
     }
 });

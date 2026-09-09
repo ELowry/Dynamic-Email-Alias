@@ -109,3 +109,8 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
         });
     }
 });
+
+// Open options page when the extension icon is clicked in the toolbar/dropdown
+browser.action.onClicked.addListener(() => {
+    browser.runtime.openOptionsPage();
+});

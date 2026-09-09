@@ -23,7 +23,8 @@ This Firefox add-on automatically detects the website you are visiting and craft
 
 ### Key Features
 
-- ✨ **Smart Generation**: Automatically extracts the website name (including localized TLDs like `.co.uk`) to create readable aliases.
+- ✨ **Smart Generation**: Automatically extracts the website name (optionally including localized TLDs like `.co.uk`) to create readable aliases.
+- 🔤 **Custom Formatting**: Add an optional custom prefix to your generated aliases (e.g., `myprefix_netflix@yourdomain.com`).
 - 🚀 **One-Click Autofill**: Right-click any email field and select "Generate Email Alias".
 - 🌐 **Multi-Domain Support**: Manage multiple custom domains and choose which one to use on the fly.
 - 🔒 **Secure**: Runs entirely locally on your browser. No data is sent to external servers.

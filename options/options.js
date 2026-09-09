@@ -2,6 +2,8 @@ const newDomainInput = document.querySelector("#newDomainInput");
 const statusDiv = document.querySelector("#status");
 const domainListContainer = document.querySelector("#domainList");
 const addDomainBtn = document.querySelector("#addDomainBtn");
+const prefixInput = document.querySelector("#prefixInput");
+const includeTldToggle = document.querySelector("#includeTldToggle");
 
 let domains = [];
 
@@ -50,6 +52,11 @@ function saveDomains() {
 }
 
 function addDomain() {
+    if (!newDomainInput.checkValidity()) {
+        newDomainInput.reportValidity();
+        return;
+    }
+
     const domain = newDomainInput.value.trim();
     if (!domain) {
         showStatus("Please enter a domain", "error");
@@ -74,9 +81,11 @@ function deleteDomain(index) {
 }
 
 function restoreOptions() {
-    browser.storage.sync.get("customDomains").then(
+    browser.storage.sync.get(["customDomains", "aliasPrefix", "includeTld"]).then(
         (result) => {
             domains = result.customDomains || [];
+            prefixInput.value = result.aliasPrefix || "";
+            includeTldToggle.checked = result.includeTld !== false;
             renderDomains();
         },
         (error) => {
@@ -85,8 +94,26 @@ function restoreOptions() {
     );
 }
 
+function saveSettings() {
+    if (!prefixInput.checkValidity()) {
+        prefixInput.reportValidity();
+        return;
+    }
+
+    browser.storage.sync
+        .set({
+            aliasPrefix: prefixInput.value.trim(),
+            includeTld: includeTldToggle.checked
+        })
+        .then(() => {
+            showStatus("Settings saved");
+        });
+}
+
 document.addEventListener("DOMContentLoaded", restoreOptions);
 addDomainBtn.addEventListener("click", addDomain);
 newDomainInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") addDomain();
 });
+prefixInput.addEventListener("change", saveSettings);
+includeTldToggle.addEventListener("change", saveSettings);

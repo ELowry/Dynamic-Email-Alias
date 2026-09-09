@@ -6,11 +6,11 @@ if (typeof window.hasSmartEmailListener === "undefined") {
 
     browser.runtime.onMessage.addListener((message) => {
         if (message.command === "fillEmail") {
-            fillEmailAction(message.domain);
+            fillEmailAction(message.domain, message.prefix, message.includeTld);
         }
     });
 
-    function fillEmailAction(domain) {
+    function fillEmailAction(domain, prefix = "", includeTld = true) {
         let target = document.activeElement;
 
         if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
@@ -37,15 +37,19 @@ if (typeof window.hasSmartEmailListener === "undefined") {
 
                     if (parts.length >= 3 && tld.length === 2 && commonSLDs.includes(secondLevel)) {
                         // e.g. amazon.co.uk -> use 'amazon.co.uk' (start from 3rd from last)
-                        siteIdentifier = parts.slice(parts.length - 3).join(".");
+                        siteIdentifier = includeTld
+                            ? parts.slice(parts.length - 3).join(".")
+                            : parts[parts.length - 3];
                     } else {
                         // e.g. bestsecret.com -> use 'bestsecret.com'
                         // e.g. login.bestsecret.com -> use 'bestsecret.com'
-                        siteIdentifier = parts.slice(parts.length - 2).join(".");
+                        siteIdentifier = includeTld
+                            ? parts.slice(parts.length - 2).join(".")
+                            : parts[parts.length - 2];
                     }
                 }
 
-                const email = `${siteIdentifier}@${domain}`;
+                const email = `${prefix}${siteIdentifier}@${domain}`;
 
                 target.value = email;
                 target.dispatchEvent(new Event("input", { bubbles: true }));

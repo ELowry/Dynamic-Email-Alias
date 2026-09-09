@@ -15,9 +15,33 @@
     <h1>Dynamic Email Alias</h1>
     <p class="subtitle">Manage your custom domains for smart email generation.</p>
 
-    <!-- Main Settings Card -->
+    <!-- General Settings Card -->
     <div class="card">
       <h2>Extension Settings</h2>
+      <p class="description">Customize how your email aliases are generated.</p>
+
+      <div class="input-group">
+        <label for="prefixInput">Alias Prefix (Optional)</label>
+        <input
+          type="text"
+          id="prefixInput"
+          placeholder="e.g. prefix_"
+          pattern="^[a-zA-Z0-9._+\-]*$"
+          title="Only letters, numbers, periods, underscores, hyphens, and plus signs are allowed."
+        />
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 16px">
+        <input type="checkbox" id="includeTldToggle" checked />
+        <label for="includeTldToggle" style="margin: 0; cursor: pointer"
+          >Include TLD in alias (netflix -> netflix.com)</label
+        >
+      </div>
+    </div>
+
+    <!-- Main Settings Card -->
+    <div class="card">
+      <h2>Domain Configuration</h2>
       <p class="description">Add the domains you want to use for your email aliases.</p>
 
       <!-- Domain List Container -->
@@ -43,7 +67,13 @@
             ></path>
           </svg>
         </div>
-        <input type="text" id="newDomainInput" placeholder="Add new domain (e.g. mydomain.com)" />
+        <input
+          type="text"
+          id="newDomainInput"
+          placeholder="Add new domain (e.g. mydomain.com)"
+          pattern="^([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}$"
+          title="Please enter a valid domain name (e.g., example.com)"
+        />
       </div>
 
       <button id="addDomainBtn" class="btn-primary">

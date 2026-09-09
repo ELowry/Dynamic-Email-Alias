@@ -103,21 +103,25 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId.startsWith("fill-")) {
         const domain = info.menuItemId.replace("fill-", "");
 
-        // Dynamically inject the content script into the active tab
-        browser.scripting
-            .executeScript({
-                target: { tabId: tab.id },
-                files: ["content/content.js"]
-            })
-            .then(() => {
-                // Once injected, send the message with ONLY the domain
-                browser.tabs.sendMessage(tab.id, {
-                    command: "fillEmail",
-                    domain: domain
+        browser.storage.sync.get(["aliasPrefix", "includeTld"]).then((result) => {
+            // Dynamically inject the content script into the active tab
+            browser.scripting
+                .executeScript({
+                    target: { tabId: tab.id },
+                    files: ["content/content.js"]
+                })
+                .then(() => {
+                    // Once injected, send the message with the domain AND the settings
+                    browser.tabs.sendMessage(tab.id, {
+                        command: "fillEmail",
+                        domain: domain,
+                        prefix: result.aliasPrefix || "",
+                        includeTld: result.includeTld !== false
+                    });
+                })
+                .catch((error) => {
+                    console.error("Failed to inject script: ", error);
                 });
-            })
-            .catch((error) => {
-                console.error("Failed to inject script: ", error);
-            });
+        });
     }
 });

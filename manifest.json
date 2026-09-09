@@ -13,6 +13,9 @@
         }
     },
     "permissions": ["storage", "contextMenus", "activeTab", "scripting"],
+    "action": {
+        "default_title": "Options"
+    },
     "background": {
         "scripts": ["background/background.js"]
     },

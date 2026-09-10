@@ -2,8 +2,14 @@ const newDomainInput = document.querySelector("#newDomainInput");
 const statusDiv = document.querySelector("#status");
 const domainListContainer = document.querySelector("#domainList");
 const addDomainBtn = document.querySelector("#addDomainBtn");
+const useSyncToggle = document.querySelector("#useSyncToggle");
 
 let domains = [];
+
+async function getStorage() {
+    const { useSync } = await browser.storage.local.get("useSync");
+    return useSync ? browser.storage.sync : browser.storage.local;
+}
 
 function renderDomains() {
     domainListContainer.innerHTML = "";
@@ -39,8 +45,9 @@ function showStatus(msg, type = "success") {
     }, 2000);
 }
 
-function saveDomains() {
-    browser.storage.sync
+async function saveDomains() {
+    const storage = await getStorage();
+    storage
         .set({
             customDomains: domains
         })
@@ -73,8 +80,15 @@ function deleteDomain(index) {
     saveDomains();
 }
 
-function restoreOptions() {
-    browser.storage.sync.get("customDomains").then(
+async function restoreOptions() {
+    // Restore the toggle state strictly from local storage
+    const localPrefs = await browser.storage.local.get("useSync");
+    if (useSyncToggle) {
+        useSyncToggle.checked = !!localPrefs.useSync;
+    }
+
+    const storage = await getStorage();
+    storage.get("customDomains").then(
         (result) => {
             domains = result.customDomains || [];
             renderDomains();
@@ -83,6 +97,30 @@ function restoreOptions() {
             console.log(`Error: ${error}`);
         }
     );
+}
+
+if (useSyncToggle) {
+    useSyncToggle.addEventListener("change", async (e) => {
+        const enableSync = e.target.checked;
+
+        const oldStorage = enableSync ? browser.storage.local : browser.storage.sync;
+        const newStorage = enableSync ? browser.storage.sync : browser.storage.local;
+
+        const allData = await oldStorage.get(null);
+
+        delete allData.useSync;
+
+        if (Object.keys(allData).length > 0) {
+            await newStorage.set(allData);
+
+            const keysToRemove = Object.keys(allData);
+            await oldStorage.remove(keysToRemove);
+        }
+
+        await browser.storage.local.set({ useSync: enableSync });
+
+        showStatus(enableSync ? "Sync enabled" : "Sync disabled");
+    });
 }
 
 document.addEventListener("DOMContentLoaded", restoreOptions);

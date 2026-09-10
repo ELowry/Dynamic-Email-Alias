@@ -3,9 +3,15 @@ const newPrefixInput = document.querySelector("#newPrefixInput");
 const statusDiv = document.querySelector("#status");
 const domainListContainer = document.querySelector("#domainList");
 const addDomainBtn = document.querySelector("#addDomainBtn");
+const useSyncToggle = document.querySelector("#useSyncToggle");
 const includeTldToggle = document.querySelector("#includeTldToggle");
 
 let domains = [];
+
+async function getStorage() {
+    const { useSync } = await browser.storage.local.get("useSync");
+    return useSync ? browser.storage.sync : browser.storage.local;
+}
 
 function renderDomains() {
     domainListContainer.innerHTML = "";
@@ -45,10 +51,15 @@ function showStatus(msg, type = "success") {
     }, 2000);
 }
 
-function saveDomains() {
-    browser.storage.sync.set({ customDomains: domains }).then(() => {
-        showStatus("Domains updated");
-    });
+async function saveDomains() {
+    const storage = await getStorage();
+    storage
+        .set({
+            customDomains: domains
+        })
+        .then(() => {
+            showStatus("Domains updated");
+        });
 }
 
 function addDomain() {
@@ -89,8 +100,15 @@ function deleteDomain(index) {
     saveDomains();
 }
 
-function restoreOptions() {
-    browser.storage.sync.get(["customDomains", "includeTld"]).then(
+async function restoreOptions() {
+    // Restore the toggle state strictly from local storage
+    const localPrefs = await browser.storage.local.get("useSync");
+    if (useSyncToggle) {
+        useSyncToggle.checked = !!localPrefs.useSync;
+    }
+
+    const storage = await getStorage();
+    storage.get("customDomains").then(
         (result) => {
             // Map legacy string arrays to the new object format automatically
             const rawDomains = result.customDomains || [];
@@ -107,9 +125,27 @@ function restoreOptions() {
     );
 }
 
-function saveSettings() {
-    browser.storage.sync.set({ includeTld: includeTldToggle.checked }).then(() => {
-        showStatus("Settings saved");
+if (useSyncToggle) {
+    useSyncToggle.addEventListener("change", async (e) => {
+        const enableSync = e.target.checked;
+
+        const oldStorage = enableSync ? browser.storage.local : browser.storage.sync;
+        const newStorage = enableSync ? browser.storage.sync : browser.storage.local;
+
+        const allData = await oldStorage.get(null);
+
+        delete allData.useSync;
+
+        if (Object.keys(allData).length > 0) {
+            await newStorage.set(allData);
+
+            const keysToRemove = Object.keys(allData);
+            await oldStorage.remove(keysToRemove);
+        }
+
+        await browser.storage.local.set({ useSync: enableSync });
+
+        showStatus(enableSync ? "Sync enabled" : "Sync disabled");
     });
 }
 
@@ -118,4 +154,3 @@ addDomainBtn.addEventListener("click", addDomain);
 newDomainInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") addDomain();
 });
-includeTldToggle.addEventListener("change", saveSettings);

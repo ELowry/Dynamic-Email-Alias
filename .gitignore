@@ -1,0 +1,6 @@
+# Affinity design file
+*.af
+*.af~lock~
+
+# Compiled extension
+/web-ext-artifacts/

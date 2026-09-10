@@ -125,6 +125,13 @@ async function restoreOptions() {
     );
 }
 
+async function saveSettings() {
+    const storage = await getStorage();
+    storage.set({ includeTld: includeTldToggle.checked }).then(() => {
+        showStatus("Settings saved");
+    });
+}
+
 if (useSyncToggle) {
     useSyncToggle.addEventListener("change", async (e) => {
         const enableSync = e.target.checked;
@@ -154,3 +161,4 @@ addDomainBtn.addEventListener("click", addDomain);
 newDomainInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") addDomain();
 });
+includeTldToggle.addEventListener("change", saveSettings);

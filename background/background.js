@@ -9,6 +9,11 @@ function onCreated() {
     }
 }
 
+async function getStorage() {
+    const { useSync } = await browser.storage.local.get("useSync");
+    return useSync ? browser.storage.sync : browser.storage.local;
+}
+
 function updateContextMenus(domains) {
     browser.contextMenus.removeAll().then(() => {
         if (!domains || domains.length === 0) {
@@ -90,6 +95,10 @@ browser.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.customDomains) {
         updateContextMenus(changes.customDomains.newValue);
     }
+
+    if (area === "local" && changes.useSync) {
+        loadAndCreateMenus();
+    }
 });
 
 // Ensure menus are created on install/update
@@ -97,7 +106,7 @@ browser.runtime.onInstalled.addListener(() => {
     loadAndCreateMenus();
 });
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === "configure-extension") {
         browser.runtime.openOptionsPage();
         return;
@@ -105,8 +114,9 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 
     if (info.menuItemId.startsWith("fill-")) {
         const clickedDomain = info.menuItemId.replace("fill-", "");
+        const storage = await getStorage();
 
-        browser.storage.sync.get(["customDomains", "includeTld"]).then((result) => {
+        storage.get(["customDomains", "includeTld"]).then((result) => {
             const domains = result.customDomains || [];
 
             // Identify the specific config object that corresponds to the clicked domain

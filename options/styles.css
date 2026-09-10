@@ -1,71 +1,78 @@
 :root {
-  --bg-main: #fcfcfc;
-  --text-main: #1a1a1a;
-  --text-heading: #111111;
-  --text-subtitle: #666666;
-  --text-label: #4b5563;
+  --bg-main: #ddd8d6;
+  --text-main: #221a1f;
+  --text-heading: #110d0f;
+  --text-subtitle: #44343e;
+  --text-label: #44343e;
 
-  --header-icon-bg: #f3e8fd;
-  --header-icon-color: #8b5cf6;
+  --header-icon-bg: rgba(109, 10, 31, 0.1);
+  --header-icon-color: #6d0a1f;
 
-  --card-bg: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.05);
-  --card-dashed-bg: #fafafa;
-  --card-dashed-border: #e5e7eb;
+  --card-bg: #e8e4e2;
+  --card-border: #b19f9e;
+  --card-dashed-bg: #d5d0ce;
+  --card-dashed-border: #a39190;
 
-  --input-bg: #ffffff;
-  --input-text: #374151;
-  --input-border: #e5e7eb;
-  --input-icon: #9ca3af;
-  --input-focus-border: #8b5cf6;
-  --input-focus-shadow: rgba(139, 92, 246, 0.1);
+  --input-bg: #ece8e6;
+  --input-text: #221a1f;
+  --input-border: #b19f9e;
+  --input-icon: #7a6d6c;
+  --input-focus-border: #6d0a1f;
+  --input-focus-shadow: rgba(109, 10, 31, 0.1);
 
-  --btn-primary-bg: #7c3aed;
-  --btn-primary-hover: #6d28d9;
+  --btn-primary-bg: #6d0a1f;
+  --btn-primary-hover: #520717;
+  --btn-primary-text: #ffffff;
 
-  --domain-item-bg: #f9fafb;
-  --domain-item-border: #e5e7eb;
+  --domain-item-bg: #e4dfdd;
+  --domain-item-border: #b19f9e;
 
-  --delete-btn-color: #9ca3af;
-  --delete-btn-hover-color: #ef4444;
-  --delete-btn-hover-bg: #fee2e2;
+  --delete-btn-color: #7a6d6c;
+  --delete-btn-hover-color: #e1739b;
+  --delete-btn-hover-bg: rgba(225, 115, 155, 0.15);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-main: #121212;
-    --text-main: #e5e7eb;
-    --text-heading: #f9fafb;
-    --text-subtitle: #9ca3af;
-    --text-label: #9ca3af;
+    --bg-main: #0f0d0f;
+    --text-main: #d1c6c1;
+    --text-heading: #ffffff;
+    --text-subtitle: #a69a95;
+    --text-label: #a69a95;
 
-    --header-icon-bg: #2e1065;
-    --header-icon-color: #a78bfa;
+    --header-icon-bg: rgba(226, 145, 134, 0.15);
+    --header-icon-color: #e29186;
 
-    --card-bg: #1e1e1e;
-    --card-border: rgba(255, 255, 255, 0.1);
-    --card-dashed-bg: #171717;
-    --card-dashed-border: #3f3f46;
+    --card-bg: #1a171a;
+    --card-border: #3d383b;
+    --card-dashed-bg: #151214;
+    --card-dashed-border: #4a4447;
 
-    --input-bg: #27272a;
-    --input-text: #f4f4f5;
-    --input-border: #3f3f46;
-    --input-icon: #a1a1aa;
-    --input-focus-border: #a78bfa;
-    --input-focus-shadow: rgba(167, 139, 250, 0.1);
+    --input-bg: #1a171a;
+    --input-text: #d1c6c1;
+    --input-border: #3d383b;
+    --input-icon: #8f837f;
+    --input-focus-border: #e29186;
+    --input-focus-shadow: rgba(226, 145, 134, 0.1);
 
-    --domain-item-bg: #27272a;
-    --domain-item-border: #3f3f46;
+    --domain-item-bg: #1f1b1e;
+    --domain-item-border: #3d383b;
 
-    --delete-btn-color: #a1a1aa;
-    --delete-btn-hover-color: #f87171;
-    --delete-btn-hover-bg: #450a0a;
+    --btn-primary-bg: #e29186;
+    --btn-primary-hover: #cf8075;
+    --btn-primary-text: #0f0d0f;
+
+    --delete-btn-color: #8f837f;
+    --delete-btn-hover-color: #e1739b;
+    --delete-btn-hover-bg: rgba(225, 115, 155, 0.15);
   }
 }
 
 body {
+  /* Updated to match your font stacks */
   font-family:
-    "Inter",
+    "Space Grotesk",
+    "Atkinson Hyperlegible Next",
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -198,7 +205,7 @@ input[type="text"]:focus {
   justify-content: center;
   width: 100%;
   background-color: var(--btn-primary-bg);
-  color: white;
+  color: var(--btn-primary-text);
   border: none;
   padding: 12px;
   border-radius: 8px;
@@ -278,20 +285,7 @@ input[type="text"]:focus {
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  background-color: #0060df;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 10000;
-}
-
-.smart-email-icon {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  background-color: #0060df;
+  background-color: var(--header-icon-color);
   border-radius: 50%;
   cursor: pointer;
   z-index: 10000;
